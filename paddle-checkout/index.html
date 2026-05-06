@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../styles.css" />
-    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
   </head>
   <body class="checkout-body">
     <header class="site-header">
@@ -26,41 +25,7 @@
     </header>
 
     <main class="checkout-page">
-      <section class="checkout-hero">
-        <div>
-          <div class="eyebrow">Secure subscription checkout</div>
-          <h1>Complete your RenalFlow subscription.</h1>
-          <p>
-            This checkout is opened from the RenalFlow desktop signup flow. Complete payment here,
-            then return to the app to continue your center setup.
-          </p>
-        </div>
-
-        <aside class="checkout-summary" aria-label="Selected RenalFlow plan">
-          <span>Selected plan</span>
-          <strong id="selected-plan-name">Growth</strong>
-          <p id="selected-plan-details">10 active users, 500 active patients, 10 GB storage.</p>
-          <div class="checkout-price" id="selected-plan-price">$99/month</div>
-        </aside>
-      </section>
-
-      <section class="checkout-layout">
-        <div class="checkout-card">
-          <h2 id="checkout-card-title">Preparing checkout...</h2>
-          <p id="checkout-card-copy">RenalFlow is loading the selected plan from your desktop signup session.</p>
-
-          <div class="checkout-frame-shell">
-            <div id="paddle-checkout-frame" class="paddle-checkout-frame">
-              <div class="checkout-loading">Loading Paddle Checkout...</div>
-            </div>
-          </div>
-
-          <button class="button primary checkout-button" id="open-checkout" type="button">Retry checkout</button>
-          <p class="checkout-note" id="checkout-message">
-            Keep this page open until Paddle confirms the subscription.
-          </p>
-        </div>
-
+      <section class="checkout-only">
         <div class="checkout-product-card">
           <div class="mock-toolbar">
             <strong>What happens next</strong>
@@ -75,7 +40,5 @@
         </div>
       </section>
     </main>
-
-    <script src="checkout.js"></script>
   </body>
 </html>

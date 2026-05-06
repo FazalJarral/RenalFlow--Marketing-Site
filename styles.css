@@ -1133,6 +1133,14 @@ input {
   margin: 0 auto;
 }
 
+.checkout-only {
+  display: grid;
+  max-width: 680px;
+  min-height: calc(100vh - 210px);
+  align-items: center;
+  margin: 0 auto;
+}
+
 .checkout-card,
 .checkout-product-card {
   padding: 24px;
