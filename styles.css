@@ -1154,6 +1154,26 @@ input {
   margin: 22px 0;
 }
 
+.checkout-frame-shell {
+  margin: 22px 0 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+
+.paddle-checkout-frame {
+  min-height: 560px;
+}
+
+.checkout-loading {
+  display: grid;
+  min-height: 220px;
+  place-items: center;
+  color: var(--muted);
+  font-weight: 800;
+}
+
 .checkout-plan {
   border: 1px solid var(--line);
   border-radius: 8px;

@@ -29,9 +29,10 @@
       <section class="checkout-hero">
         <div>
           <div class="eyebrow">Secure subscription checkout</div>
-          <h1>Start RenalFlow for your dialysis center.</h1>
+          <h1>Complete your RenalFlow subscription.</h1>
           <p>
-            Choose a plan, open Paddle Checkout, then download the desktop app and sign in to your center workspace.
+            This checkout is opened from the RenalFlow desktop signup flow. Complete payment here,
+            then return to the app to continue your center setup.
           </p>
         </div>
 
@@ -45,30 +46,18 @@
 
       <section class="checkout-layout">
         <div class="checkout-card">
-          <h2>Choose your plan</h2>
-          <p>All plans include patient records, sessions, lab matrix, nutrition, vitals, attachments, PDF export, and audit logs.</p>
+          <h2 id="checkout-card-title">Preparing checkout...</h2>
+          <p id="checkout-card-copy">RenalFlow is loading the selected plan from your desktop signup session.</p>
 
-          <div class="checkout-plan-list" role="radiogroup" aria-label="RenalFlow plans">
-            <button class="checkout-plan" data-plan="starter" type="button">
-              <span>Starter</span>
-              <strong>$39/month</strong>
-              <em>3 users / 100 patients</em>
-            </button>
-            <button class="checkout-plan active" data-plan="growth" type="button">
-              <span>Growth</span>
-              <strong>$99/month</strong>
-              <em>10 users / 500 patients</em>
-            </button>
-            <button class="checkout-plan" data-plan="pro" type="button">
-              <span>Pro</span>
-              <strong>$249/month</strong>
-              <em>25 users / 1500 patients</em>
-            </button>
+          <div class="checkout-frame-shell">
+            <div id="paddle-checkout-frame" class="paddle-checkout-frame">
+              <div class="checkout-loading">Loading Paddle Checkout...</div>
+            </div>
           </div>
 
-          <button class="button primary checkout-button" id="open-checkout" type="button">Open Paddle Checkout</button>
+          <button class="button primary checkout-button" id="open-checkout" type="button">Retry checkout</button>
           <p class="checkout-note" id="checkout-message">
-            Paddle account values are configured in <code>paddle-checkout/checkout.js</code>.
+            Keep this page open until Paddle confirms the subscription.
           </p>
         </div>
 
@@ -79,8 +68,8 @@
           </div>
           <div class="checkout-steps">
             <div><span>01</span><strong>Complete checkout</strong><p>Paddle confirms the subscription for the selected plan.</p></div>
-            <div><span>02</span><strong>Download app</strong><p>Install the RenalFlow desktop executable on the center workstation.</p></div>
-            <div><span>03</span><strong>Create center</strong><p>Sign up, save the one-time license key, and start your center workspace.</p></div>
+            <div><span>02</span><strong>Return to RenalFlow</strong><p>Go back to the desktop app signup flow after checkout succeeds.</p></div>
+            <div><span>03</span><strong>Activate workspace</strong><p>Your center can continue with license key setup and app access.</p></div>
           </div>
           <a class="button secondary" href="../downloads/RenalFlow-Setup.exe" download>Download desktop app</a>
         </div>

@@ -1,12 +1,12 @@
 const paddleConfig = {
   // Replace with the client-side token from your Paddle account.
   // Example shape: clientToken: "test_..." or "live_..."
-  clientToken: "PADDLE_CLIENT_TOKEN_PLACEHOLDER",
+  clientToken: "PADDLE_CLIENT_SIDE_TOKEN",
   environment: "sandbox",
   prices: {
-    starter: "PADDLE_PRICE_ID_STARTER_MONTHLY",
-    growth: "PADDLE_PRICE_ID_GROWTH_MONTHLY",
-    pro: "PADDLE_PRICE_ID_PRO_MONTHLY"
+    starter: "pri_01kqjg3ak7r2n1nsqm94m10v73",
+    growth: "pri_01kqjg435a0dn8qa8qke04y53c",
+    pro: "pri_01kqjg4jfh9bhm6qbnbwnw6vpn"
   }
 };
 
@@ -30,13 +30,21 @@ const planCopy = {
 
 const params = new URLSearchParams(window.location.search);
 let selectedPlan = planCopy[params.get("plan")] ? params.get("plan") : "growth";
+const signupContext = {
+  centerId: params.get("center_id") || params.get("centerId") || "",
+  email: params.get("email") || "",
+  successUrl: params.get("success_url") || "",
+  cancelUrl: params.get("cancel_url") || ""
+};
 
-const planButtons = document.querySelectorAll(".checkout-plan");
 const selectedName = document.querySelector("#selected-plan-name");
 const selectedDetails = document.querySelector("#selected-plan-details");
 const selectedPrice = document.querySelector("#selected-plan-price");
 const checkoutButton = document.querySelector("#open-checkout");
 const checkoutMessage = document.querySelector("#checkout-message");
+const checkoutTitle = document.querySelector("#checkout-card-title");
+const checkoutCopy = document.querySelector("#checkout-card-copy");
+let paddleReady = false;
 
 function updatePlan(plan) {
   selectedPlan = plan;
@@ -44,21 +52,22 @@ function updatePlan(plan) {
   selectedName.textContent = copy.name;
   selectedDetails.textContent = copy.details;
   selectedPrice.textContent = copy.price;
-  planButtons.forEach((button) => {
-    button.classList.toggle("active", button.dataset.plan === plan);
-  });
+  checkoutTitle.textContent = `${copy.name} checkout`;
+  checkoutCopy.textContent = `Complete the ${copy.name} subscription for RenalFlow. ${copy.details}`;
 }
 
 function hasRealPaddleConfig() {
   return (
     paddleConfig.clientToken &&
     !paddleConfig.clientToken.includes("PLACEHOLDER") &&
+    !paddleConfig.clientToken.includes("PADDLE_") &&
     paddleConfig.prices[selectedPlan] &&
     !paddleConfig.prices[selectedPlan].includes("PADDLE_PRICE_ID")
   );
 }
 
 function initializePaddle() {
+  if (paddleReady) return true;
   if (!window.Paddle || !hasRealPaddleConfig()) return false;
   if (paddleConfig.environment === "sandbox") {
     window.Paddle.Environment.set("sandbox");
@@ -66,31 +75,54 @@ function initializePaddle() {
   window.Paddle.Initialize({
     token: paddleConfig.clientToken
   });
+  paddleReady = true;
   return true;
 }
 
-planButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    updatePlan(button.dataset.plan);
-  });
-});
+function checkoutPayload() {
+  const settings = {
+    displayMode: "inline",
+    frameTarget: "paddle-checkout-frame",
+    frameInitialHeight: 560,
+    frameStyle: "width:100%; min-width:312px; background-color: transparent; border: none;"
+  };
 
-checkoutButton.addEventListener("click", () => {
-  if (!initializePaddle()) {
-    checkoutMessage.innerHTML =
-      "Checkout is ready, but Paddle values still need to be added in <code>paddle-checkout/checkout.js</code>.";
-    checkoutMessage.classList.add("checkout-warning");
-    return;
-  }
+  if (signupContext.successUrl) settings.successUrl = signupContext.successUrl;
 
-  window.Paddle.Checkout.open({
+  const payload = {
+    settings,
     items: [
       {
         priceId: paddleConfig.prices[selectedPlan],
         quantity: 1
       }
-    ]
-  });
-});
+    ],
+    customData: {
+      plan_slug: selectedPlan,
+      source: "renalflow_desktop_signup"
+    }
+  };
+
+  if (signupContext.centerId) payload.customData.center_id = signupContext.centerId;
+  if (signupContext.email) payload.customer = { email: signupContext.email };
+  return payload;
+}
+
+function openCheckout() {
+  if (!initializePaddle()) {
+    checkoutMessage.innerHTML =
+      "Checkout could not load. Confirm Paddle values in <code>paddle-checkout/checkout.js</code> and check your connection.";
+    checkoutMessage.classList.add("checkout-warning");
+    return;
+  }
+
+  checkoutMessage.textContent = "Paddle Checkout is loaded below. Complete payment, then return to RenalFlow.";
+  checkoutMessage.classList.remove("checkout-warning");
+  checkoutButton.textContent = "Reload checkout";
+  window.Paddle.Checkout.open(checkoutPayload());
+}
+
+checkoutButton.addEventListener("click", openCheckout);
 
 updatePlan(selectedPlan);
+openCheckout();
