@@ -1,7 +1,7 @@
 const paddleConfig = {
   // Replace with the client-side token from your Paddle account.
   // Example shape: clientToken: "test_..." or "live_..."
-  clientToken: "PADDLE_CLIENT_SIDE_TOKEN",
+  clientToken: "test_80f1101561de2df4b98337c622f",
   environment: "sandbox",
   prices: {
     starter: "pri_01kqjg3ak7r2n1nsqm94m10v73",
