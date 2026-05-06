@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="RenalFlow is product-led dialysis center software for patient records, dialysis sessions, matrix labs, nutrition planning, staff roles, and billing limits."
+    />
+    <title>RenalFlow | Dialysis Center Software</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="RenalFlow home">
+        <span class="brand-mark">R</span>
+        <span>RenalFlow</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#product">Product</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#trust">Trust</a>
+      </nav>
+      <a class="header-cta" href="downloads/RenalFlow-Setup.exe" download>Download app</a>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow">For private dialysis centers</div>
+          <h1>Run dialysis care from intake to monthly review.</h1>
+          <p>
+            RenalFlow brings patient records, session vitals, matrix labs, renal nutrition, staff roles,
+            and center billing limits into one clinical desktop workspace.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="downloads/RenalFlow-Setup.exe" download>Download desktop app</a>
+            <a class="button secondary" href="#product">Explore product</a>
+          </div>
+          <div class="hero-proof" aria-label="Product highlights">
+            <span>Patient profile</span>
+            <span>Lab matrix</span>
+            <span>Diet plans</span>
+            <span>Plan limits</span>
+          </div>
+        </div>
+
+        <div class="hero-product" aria-label="RenalFlow dashboard mock interface">
+          <div class="app-shell">
+            <aside class="app-sidebar">
+              <div class="app-logo">RenalFlow</div>
+              <div class="role-pill">center admin</div>
+              <div class="side-item active"><span></span>Dashboard</div>
+              <div class="side-item"><span></span>Patients</div>
+              <div class="side-item"><span></span>Schedule</div>
+              <div class="side-item"><span></span>Lab Panels</div>
+              <div class="side-item"><span></span>Billing</div>
+            </aside>
+            <section class="app-main">
+              <div class="app-topbar">
+                <div>
+                  <small>Signed in as</small>
+                  <strong>Center Admin</strong>
+                </div>
+                <span class="status-online">Online</span>
+              </div>
+              <div class="screen-heading">
+                <div>
+                  <h2>Today's Clinical Dashboard</h2>
+                  <p>Sessions, reminders, abnormal labs, and nutrition gaps.</p>
+                </div>
+                <span class="date-chip">May 2</span>
+              </div>
+              <div class="metric-grid">
+                <div class="metric-card"><span>Today's sessions</span><strong>38</strong></div>
+                <div class="metric-card"><span>In session</span><strong>11</strong></div>
+                <div class="metric-card warn"><span>Missed</span><strong>2</strong></div>
+                <div class="metric-card"><span>No diet plan</span><strong>17</strong></div>
+              </div>
+              <div class="dashboard-panels">
+                <div class="panel wide">
+                  <div class="panel-title">Active and Upcoming Sessions</div>
+                  <div class="session-row">
+                    <div><strong>Abdul Rehman</strong><span>Machine 04</span></div>
+                    <em class="badge blue">in progress</em>
+                  </div>
+                  <div class="session-row">
+                    <div><strong>Maria Khan</strong><span>Machine 02</span></div>
+                    <em class="badge neutral">scheduled</em>
+                  </div>
+                  <div class="session-row">
+                    <div><strong>Saleem Akhtar</strong><span>Machine 07</span></div>
+                    <em class="badge danger">missed</em>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-title">Nutrition Watch</div>
+                  <div class="lab-alert">Potassium high</div>
+                  <div class="mini-chart">
+                    <span style="height: 42%"></span>
+                    <span style="height: 64%"></span>
+                    <span style="height: 48%"></span>
+                    <span style="height: 82%"></span>
+                    <span style="height: 58%"></span>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="logos" aria-label="RenalFlow product areas">
+        <span>Patients</span>
+        <span>Dialysis Sessions</span>
+        <span>Matrix Labs</span>
+        <span>Renal Nutrition</span>
+        <span>Staff Roles</span>
+        <span>Billing Limits</span>
+      </section>
+
+      <section class="section product-tour" id="product">
+        <div class="section-heading">
+          <div class="eyebrow">Guided product demo</div>
+          <h2>See the app the way your team will use it.</h2>
+          <p>Every panel below is modeled on real RenalFlow workflows and terminology.</p>
+        </div>
+
+        <div class="tour-layout">
+          <div class="tour-tabs" role="tablist" aria-label="Product workflow tabs">
+            <button class="tour-tab active" data-tour="dashboard" type="button">Dashboard</button>
+            <button class="tour-tab" data-tour="patients" type="button">Patients</button>
+            <button class="tour-tab" data-tour="sessions" type="button">Sessions</button>
+            <button class="tour-tab" data-tour="labs" type="button">Labs</button>
+            <button class="tour-tab" data-tour="nutrition" type="button">Nutrition</button>
+            <button class="tour-tab" data-tour="billing" type="button">Billing</button>
+          </div>
+
+          <div class="tour-screen" data-active-tour="dashboard">
+            <article class="tour-panel active" data-panel="dashboard">
+              <div class="mock-toolbar">
+                <strong>Today's Clinical Dashboard</strong>
+                <span>Live center view</span>
+              </div>
+              <div class="mock-grid four">
+                <div class="mini-stat"><span>Today's sessions</span><strong>38</strong></div>
+                <div class="mini-stat"><span>Upcoming</span><strong>25</strong></div>
+                <div class="mini-stat amber"><span>Reminders</span><strong>9</strong></div>
+                <div class="mini-stat red"><span>High K/Phos</span><strong>4</strong></div>
+              </div>
+              <div class="mock-table">
+                <div class="table-row head"><span>Patient</span><span>Machine</span><span>Status</span></div>
+                <div class="table-row"><span>Hina Yousaf</span><span>03</span><span class="badge blue">in progress</span></div>
+                <div class="table-row"><span>Javed Iqbal</span><span>06</span><span class="badge neutral">scheduled</span></div>
+                <div class="table-row"><span>Farah Ali</span><span>01</span><span class="badge danger">missed</span></div>
+              </div>
+            </article>
+
+            <article class="tour-panel" data-panel="patients">
+              <div class="mock-toolbar">
+                <strong>Patient Profile</strong>
+                <span>Code RF-2048</span>
+              </div>
+              <div class="patient-header-card">
+                <div>
+                  <strong>Abdul Rehman</strong>
+                  <span>Active patient - AV fistula, left arm</span>
+                </div>
+                <button>Export PDF</button>
+              </div>
+              <div class="mock-grid three">
+                <div class="info-card"><span>Diagnosis</span><strong>ESRD on maintenance HD</strong></div>
+                <div class="info-card"><span>Dialysis start</span><strong>2024-10-18</strong></div>
+                <div class="info-card"><span>Latest lab</span><strong>2026-04-29</strong></div>
+              </div>
+              <div class="note-card">Doctor note: Review fluid restriction after next post-session weight trend.</div>
+            </article>
+
+            <article class="tour-panel" data-panel="sessions">
+              <div class="mock-toolbar">
+                <strong>Dialysis Sessions</strong>
+                <span>Created from Schedule</span>
+              </div>
+              <div class="session-flow">
+                <span class="flow-step done">Scheduled</span>
+                <span class="flow-step active">In progress</span>
+                <span class="flow-step">Completed</span>
+              </div>
+              <div class="vitals-grid">
+                <div><span>Phase</span><strong>during</strong></div>
+                <div><span>BP</span><strong>142/88</strong></div>
+                <div><span>Pulse</span><strong>84</strong></div>
+                <div><span>Sugar</span><strong>126</strong></div>
+                <div><span>SpO2</span><strong>98</strong></div>
+              </div>
+              <div class="session-actions"><button>Complete Session</button><button class="muted">Early terminate</button></div>
+            </article>
+
+            <article class="tour-panel" data-panel="labs">
+              <div class="mock-toolbar">
+                <strong>Matrix Lab Report</strong>
+                <span>RFT + Electrolytes</span>
+              </div>
+              <div class="matrix-table">
+                <div class="matrix-row head"><span>Test</span><span>Unit</span><span>Apr 01</span><span>Apr 15</span><span>Apr 29</span></div>
+                <div class="matrix-row"><span>Creatinine</span><span>mg/dL</span><span>7.1</span><span>7.8</span><span class="cell-high">8.2</span></div>
+                <div class="matrix-row"><span>Potassium</span><span>mmol/L</span><span>4.9</span><span>5.2</span><span class="cell-high">5.8</span></div>
+                <div class="matrix-row"><span>Albumin</span><span>g/dL</span><span>3.8</span><span>3.7</span><span>3.9</span></div>
+                <div class="matrix-row"><span>Hemoglobin</span><span>g/dL</span><span>10.2</span><span>10.6</span><span>10.4</span></div>
+              </div>
+            </article>
+
+            <article class="tour-panel" data-panel="nutrition">
+              <div class="mock-toolbar">
+                <strong>Nutrition</strong>
+                <span>Active renal diet plan</span>
+              </div>
+              <div class="nutrition-targets">
+                <div><span>Fluid</span><strong>900 mL/day</strong></div>
+                <div><span>Sodium</span><strong>1800 mg/day</strong></div>
+                <div><span>Potassium</span><strong>2000 mg/day</strong></div>
+                <div><span>Phosphorus</span><strong>900 mg/day</strong></div>
+              </div>
+              <div class="meal-list">
+                <div><strong>08:00 Breakfast</strong><span>Egg white, toast, measured tea</span></div>
+                <div><strong>13:30 Lunch</strong><span>Chicken, rice, low potassium vegetables</span></div>
+                <div><strong>Avoid / Limit</strong><span>Banana, cola drinks, high sodium pickles</span></div>
+              </div>
+            </article>
+
+            <article class="tour-panel" data-panel="billing">
+              <div class="mock-toolbar">
+                <strong>Billing</strong>
+                <span>Center admin only</span>
+              </div>
+              <div class="billing-status">
+                <div><span>Plan</span><strong>Growth</strong></div>
+                <div><span>Status</span><strong>trialing</strong></div>
+                <div><span>Users</span><strong>6 / 10</strong></div>
+                <div><span>Patients</span><strong>284 / 500</strong></div>
+              </div>
+              <div class="usage-bar"><span style="width: 57%"></span></div>
+              <div class="license-card">License key prefix: RF-9K2A - raw keys are shown once.</div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section workflow" id="workflow">
+        <div class="section-heading">
+          <div class="eyebrow">From patient intake to monthly review</div>
+          <h2>A dialysis workflow, not a blank database.</h2>
+          <p>RenalFlow follows the path of care your center already runs every week.</p>
+        </div>
+        <div class="timeline">
+          <article>
+            <span>01</span>
+            <h3>Add patient</h3>
+            <p>Capture internal code, demographics, dialysis start date, diagnosis, access type, allergies, and medications.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Schedule session</h3>
+            <p>Create regular days, shift, next session time, and machine number. Scheduled sessions appear on the dashboard.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Record vitals</h3>
+            <p>Technicians track pre, during, and post-session vitals while the session moves from scheduled to completed.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Update labs</h3>
+            <p>Technicians enter panel-based matrix labs while doctors compare recent dates and abnormal values.</p>
+          </article>
+          <article>
+            <span>05</span>
+            <h3>Create diet plan</h3>
+            <p>Nutritionists set renal targets, meals, avoid/limit lists, and notes informed by patient labs.</p>
+          </article>
+          <article>
+            <span>06</span>
+            <h3>Review progress</h3>
+            <p>Export patient summaries and diet plans, review trends, and keep every update center-scoped.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section showcases">
+        <div class="showcase">
+          <div class="showcase-copy">
+            <div class="eyebrow">Patient records</div>
+            <h2>Every patient opens into the clinical context your team needs.</h2>
+            <p>
+              Patient profile tabs bring dialysis access, diagnosis, current medications, notes, vaccinations,
+              injections, labs, sessions, and PDF exports into one record.
+            </p>
+          </div>
+          <div class="patient-mock">
+            <div class="patient-banner">
+              <strong>Maria Khan</strong>
+              <span>Active - vascular access: catheter, right IJ</span>
+            </div>
+            <div class="patient-cards">
+              <div><span>Blood group</span><strong>B+</strong></div>
+              <div><span>Latest session</span><strong>May 2</strong></div>
+              <div><span>Latest lab report</span><strong>Apr 29</strong></div>
+              <div><span>Diet plan</span><strong>Active</strong></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="showcase reverse">
+          <div class="lab-mock">
+            <div class="mock-toolbar">
+              <strong>Lab Panels</strong>
+              <span>Center verified</span>
+            </div>
+            <div class="panel-picker">
+              <span class="selected">RFT</span>
+              <span>CBC / CP</span>
+              <span>Electrolytes</span>
+              <span>Hepatitis Profile</span>
+            </div>
+            <div class="matrix-table compact">
+              <div class="matrix-row head"><span>Row</span><span>Type</span><span>Unit</span><span>Range</span></div>
+              <div class="matrix-row"><span>Urea</span><span>numeric</span><span>mg/dL</span><span>15-45</span></div>
+              <div class="matrix-row"><span>Creatinine</span><span>numeric</span><span>mg/dL</span><span>0.6-1.3</span></div>
+              <div class="matrix-row"><span>Potassium</span><span>numeric</span><span>mmol/L</span><span>3.5-5.1</span></div>
+            </div>
+          </div>
+          <div class="showcase-copy">
+            <div class="eyebrow">Labs</div>
+            <h2>Matrix entry matches how lab reports actually arrive.</h2>
+            <p>
+              Select panels, add report metadata, enter values across dates, standardize units,
+              block missing conversions on completion, and compare recent values in one view.
+            </p>
+          </div>
+        </div>
+
+        <div class="feature-grid">
+          <article>
+            <h3>Dialysis sessions</h3>
+            <p>Start, complete, miss, or early terminate sessions with vitals by phase and machine context.</p>
+            <div class="mini-ui">
+              <span class="badge neutral">scheduled</span>
+              <span class="badge blue">in progress</span>
+              <span class="badge good">completed</span>
+            </div>
+          </article>
+          <article>
+            <h3>Renal nutrition</h3>
+            <p>Build diet plans with calories, protein, fluid, sodium, potassium, phosphorus, alternatives, and restrictions.</p>
+            <div class="mini-ui nutrient">
+              <span>Na 1620</span>
+              <span>K 1880</span>
+              <span>Fluid 820</span>
+            </div>
+          </article>
+          <article>
+            <h3>Roles and permissions</h3>
+            <p>Center admins, doctors, technicians, and nutritionists see workflows that match their responsibilities.</p>
+            <div class="role-list"><span>admin</span><span>doctor</span><span>technician</span><span>nutritionist</span></div>
+          </article>
+          <article>
+            <h3>Billing limits</h3>
+            <p>Plan limits are visible in-app and enforced for active users and active patients.</p>
+            <div class="limit-card"><strong>284 / 500</strong><span>active patients</span></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section pricing" id="pricing">
+        <div class="section-heading">
+          <div class="eyebrow">Pricing</div>
+          <h2>Plans based on the actual RenalFlow SaaS rules.</h2>
+          <p>All public plans include clinical core, labs, nutrition, sessions, vitals, attachments, PDF export, and audit logs.</p>
+        </div>
+        <div class="pricing-grid">
+          <article class="price-card">
+            <h3>Starter</h3>
+            <div class="price">$39<span>/month</span></div>
+            <p>For smaller centers digitizing core workflows.</p>
+            <ul>
+              <li>3 active users</li>
+              <li>100 active patients</li>
+              <li>2 GB storage limit</li>
+              <li>Standard support</li>
+            </ul>
+            <a href="paddle-checkout/?plan=starter">Start Starter</a>
+          </article>
+          <article class="price-card featured">
+            <div class="recommended">Recommended</div>
+            <h3>Growth</h3>
+            <div class="price">$99<span>/month</span></div>
+            <p>For active centers with larger teams and patient panels.</p>
+            <ul>
+              <li>10 active users</li>
+              <li>500 active patients</li>
+              <li>10 GB storage limit</li>
+              <li>Standard support</li>
+            </ul>
+            <a href="paddle-checkout/?plan=growth">Start Growth</a>
+          </article>
+          <article class="price-card">
+            <h3>Pro</h3>
+            <div class="price">$249<span>/month</span></div>
+            <p>For high-volume programs that need more capacity.</p>
+            <ul>
+              <li>25 active users</li>
+              <li>1500 active patients</li>
+              <li>50 GB storage limit</li>
+              <li>Priority support and analytics flag</li>
+            </ul>
+            <a href="paddle-checkout/?plan=pro">Start Pro</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section trust" id="trust">
+        <div class="trust-card">
+          <div>
+            <div class="eyebrow">Secure clinical workflows</div>
+            <h2>Designed for organized records and center-scoped access.</h2>
+            <p>
+              RenalFlow uses role-aware navigation, Supabase row-level security, center-prefixed storage paths,
+              audit logs, license keys, and billing access checks. It helps teams leave scattered spreadsheets
+              without making unsupported compliance promises.
+            </p>
+          </div>
+          <div class="trust-grid">
+            <div><strong>RLS</strong><span>Center-isolated data access</span></div>
+            <div><strong>Roles</strong><span>Admin, doctor, technician, nutritionist</span></div>
+            <div><strong>Audit logs</strong><span>Trace important clinical changes</span></div>
+            <div><strong>License keys</strong><span>Raw keys shown once, hashes stored</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="final-cta" id="cta">
+        <div>
+          <div class="eyebrow">Ready to see the real flow?</div>
+          <h2>Install RenalFlow and walk through a real dialysis center day.</h2>
+          <p>Download the desktop app to explore patient intake, sessions, labs, renal diet planning, and center billing limits.</p>
+        </div>
+        <div class="cta-actions">
+          <a class="button primary" href="downloads/RenalFlow-Setup.exe" download>Download desktop app</a>
+          <a class="button secondary" href="paddle-checkout/?plan=growth">Choose plan</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>RenalFlow</span>
+      <span>Product-led dialysis center software</span>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
