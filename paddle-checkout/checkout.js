@@ -18,6 +18,7 @@ const planCopy = {
 
 const params = new URLSearchParams(window.location.search);
 const checkoutContext = {
+  transactionId: params.get("_ptxn") || "",
   plan: (params.get("plan") || "").toLowerCase(),
   activationRequestId: params.get("activation_request_id") || "",
   email: params.get("email") || "",
@@ -59,6 +60,10 @@ function validateQuery() {
 
   if (!checkoutContext.activationRequestId || checkoutContext.activationRequestId.length > 160) {
     throw new Error("Missing activation_request_id. Open checkout from the RenalFlow desktop activation flow.");
+  }
+
+  if (checkoutContext.transactionId && !/^txn_[a-z0-9]+$/i.test(checkoutContext.transactionId)) {
+    throw new Error("The Paddle transaction passed to checkout is not valid.");
   }
 
   if (checkoutContext.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(checkoutContext.email)) {
@@ -103,6 +108,13 @@ function checkoutPayload() {
   };
 
   if (checkoutContext.successUrl) settings.successUrl = checkoutContext.successUrl;
+
+  if (checkoutContext.transactionId) {
+    return {
+      settings,
+      transactionId: checkoutContext.transactionId
+    };
+  }
 
   const payload = {
     settings,
