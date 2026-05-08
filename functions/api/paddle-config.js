@@ -16,7 +16,7 @@ function json(body, init = {}) {
 
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
-  const plan = String(url.searchParams.get("plan") || "").toLowerCase();
+  const plan = String(url.searchParams.get("plan_slug") || url.searchParams.get("plan") || "").toLowerCase();
   const priceId = ALLOWED_PLANS[plan];
 
   if (!priceId) {

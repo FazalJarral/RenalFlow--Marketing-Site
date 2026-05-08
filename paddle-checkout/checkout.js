@@ -19,9 +19,13 @@ const planCopy = {
 const params = new URLSearchParams(window.location.search);
 const checkoutContext = {
   transactionId: params.get("_ptxn") || "",
-  plan: (params.get("plan") || "").toLowerCase(),
+  centerId: params.get("center_id") || "",
+  planSlug: (params.get("plan_slug") || params.get("plan") || "").toLowerCase(),
+  billingInterval: (params.get("billing_interval") || "monthly").toLowerCase(),
   activationRequestId: params.get("activation_request_id") || "",
+  deviceId: params.get("device_id") || "",
   email: params.get("email") || "",
+  source: params.get("source") || "marketing",
   successUrl: params.get("success_url") || "",
   cancelUrl: params.get("cancel_url") || ""
 };
@@ -54,11 +58,15 @@ function renderPlan(plan) {
 }
 
 function validateQuery() {
-  if (!planCopy[checkoutContext.plan]) {
+  if (!checkoutContext.centerId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(checkoutContext.centerId)) {
+    throw new Error("Missing center_id. Open checkout from RenalFlow desktop.");
+  }
+
+  if (!planCopy[checkoutContext.planSlug]) {
     throw new Error("Choose a valid RenalFlow plan from the desktop app or pricing page.");
   }
 
-  if (!checkoutContext.activationRequestId || checkoutContext.activationRequestId.length > 160) {
+  if (checkoutContext.activationRequestId && checkoutContext.activationRequestId.length > 160) {
     throw new Error("Missing activation_request_id. Open checkout from the RenalFlow desktop activation flow.");
   }
 
@@ -72,7 +80,7 @@ function validateQuery() {
 }
 
 async function loadCheckoutConfig() {
-  const response = await fetch(`/api/paddle-config?plan=${encodeURIComponent(checkoutContext.plan)}`, {
+  const response = await fetch(`/api/paddle-config?plan_slug=${encodeURIComponent(checkoutContext.planSlug)}`, {
     headers: { Accept: "application/json" }
   });
   const body = await response.json().catch(() => ({}));
@@ -81,6 +89,27 @@ async function loadCheckoutConfig() {
     throw new Error(body.error || "Checkout configuration could not be loaded.");
   }
 
+  return body;
+}
+
+async function validateCheckout() {
+  const response = await fetch("/api/validate-checkout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    },
+    body: JSON.stringify({
+      center_id: checkoutContext.centerId,
+      target_plan_slug: checkoutContext.planSlug,
+      billing_interval: checkoutContext.billingInterval,
+      action: checkoutContext.transactionId ? "checkout" : "marketing_checkout"
+    })
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok || body.allowed === false) {
+    throw new Error(body.reason || body.error || "This checkout is not allowed for the selected center.");
+  }
   return body;
 }
 
@@ -126,8 +155,13 @@ function checkoutPayload() {
     ],
     customData: {
       activation_request_id: checkoutContext.activationRequestId,
-      product: "renalflow-desktop",
-      plan: checkoutContext.plan
+      center_id: checkoutContext.centerId,
+      plan_slug: checkoutContext.planSlug,
+      billing_interval: checkoutContext.billingInterval,
+      device_id: checkoutContext.deviceId,
+      email: checkoutContext.email,
+      source: checkoutContext.source,
+      product: "renalflow-desktop"
     }
   };
 
@@ -154,7 +188,8 @@ function openCheckout() {
 async function start() {
   try {
     validateQuery();
-    renderPlan(checkoutContext.plan);
+    renderPlan(checkoutContext.planSlug);
+    await validateCheckout();
     paddleConfig = await loadCheckoutConfig();
     openCheckout();
   } catch (error) {
