@@ -1,5 +1,3 @@
-const crypto = require("crypto");
-
 const ALLOWED_PLANS = {
   starter: "pri_01kqjg3ak7r2n1nsqm94m10v73",
   growth: "pri_01kqjg435a0dn8qa8qke04y53c",
@@ -14,10 +12,7 @@ const ACTIVE_TRANSACTION_EVENTS = new Set([
   "subscription.updated"
 ]);
 
-const FAILED_EVENTS = new Set([
-  "transaction.payment_failed",
-  "subscription.payment_failed"
-]);
+const FAILED_EVENTS = new Set(["transaction.payment_failed", "subscription.payment_failed"]);
 
 const SUBSCRIPTION_STATUS = {
   active: "active",
@@ -29,16 +24,21 @@ const SUBSCRIPTION_STATUS = {
   deleted: "cancelled"
 };
 
-module.exports = async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.setHeader("Allow", "POST");
-    return res.status(405).json({ error: "Method not allowed" });
-  }
+function json(body, init = {}) {
+  return new Response(JSON.stringify(body), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      ...(init.headers || {})
+    }
+  });
+}
 
+export async function onRequestPost({ request, env }) {
   try {
-    assertEnv();
-    const rawBody = await readRawBody(req);
-    verifyPaddleSignature(req.headers["paddle-signature"], rawBody, process.env.PADDLE_WEBHOOK_SECRET);
+    assertEnv(env);
+    const rawBody = await request.text();
+    await verifyPaddleSignature(request.headers.get("paddle-signature"), rawBody, env.PADDLE_WEBHOOK_SECRET);
 
     const event = JSON.parse(rawBody);
     const eventType = event.event_type;
@@ -51,30 +51,34 @@ module.exports = async function handler(req, res) {
     });
 
     if (isPaidEvent(eventType, data) && data.custom_data?.activation_request_id) {
-      await provisionPaidLicense(eventType, data);
+      await provisionPaidLicense(env, eventType, data);
     } else if (isStatusEvent(eventType, data)) {
-      await updateLicenseStatus(eventType, data);
+      await updateLicenseStatus(env, eventType, data);
     } else if (isPaidEvent(eventType, data)) {
-      await updateLicenseStatus(eventType, { ...data, status: data.status || "active" });
+      await updateLicenseStatus(env, eventType, { ...data, status: data.status || "active" });
     } else {
       console.log("Ignoring Paddle webhook event", { eventType, dataId: data.id });
     }
 
-    return res.status(200).json({ received: true });
+    return json({ received: true });
   } catch (error) {
     const status = error.statusCode || 500;
     console.error("Paddle webhook failed", {
       status,
       message: error.message
     });
-    return res.status(status).json({ error: status >= 500 ? "Webhook processing failed" : error.message });
+    return json({ error: status >= 500 ? "Webhook processing failed" : error.message }, { status });
   }
-};
+}
 
-function assertEnv() {
+export async function onRequest() {
+  return json({ error: "Method not allowed" }, { status: 405, headers: { Allow: "POST" } });
+}
+
+function assertEnv(env) {
   const required = ["PADDLE_WEBHOOK_SECRET", "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"];
   for (const name of required) {
-    if (!process.env[name]) {
+    if (!env[name]) {
       const error = new Error(`Missing ${name}`);
       error.statusCode = 500;
       throw error;
@@ -82,16 +86,7 @@ function assertEnv() {
   }
 }
 
-function readRawBody(req) {
-  return new Promise((resolve, reject) => {
-    const chunks = [];
-    req.on("data", (chunk) => chunks.push(Buffer.from(chunk)));
-    req.on("end", () => resolve(Buffer.concat(chunks).toString("utf8")));
-    req.on("error", reject);
-  });
-}
-
-function verifyPaddleSignature(signatureHeader, rawBody, secret) {
+async function verifyPaddleSignature(signatureHeader, rawBody, secret) {
   if (!signatureHeader) {
     const error = new Error("Missing Paddle signature");
     error.statusCode = 401;
@@ -115,26 +110,46 @@ function verifyPaddleSignature(signatureHeader, rawBody, secret) {
   }
 
   const ageMs = Math.abs(Date.now() - Number(timestamp) * 1000);
-  if (!Number.isFinite(ageMs) || ageMs > 5 * 1000) {
+  if (!Number.isFinite(ageMs) || ageMs > 5 * 60 * 1000) {
     const error = new Error("Expired Paddle signature");
     error.statusCode = 401;
     throw error;
   }
 
   const signedPayload = `${timestamp}:${rawBody}`;
-  const expected = crypto.createHmac("sha256", secret).update(signedPayload, "utf8").digest("hex");
-  const expectedBuffer = Buffer.from(expected, "hex");
-
-  const matched = signatures.some((signature) => {
-    const signatureBuffer = Buffer.from(signature, "hex");
-    return signatureBuffer.length === expectedBuffer.length && crypto.timingSafeEqual(signatureBuffer, expectedBuffer);
-  });
+  const expected = await hmacSha256Hex(secret, signedPayload);
+  const matched = signatures.some((signature) => timingSafeEqualHex(signature, expected));
 
   if (!matched) {
     const error = new Error("Invalid Paddle signature");
     error.statusCode = 401;
     throw error;
   }
+}
+
+async function hmacSha256Hex(secret, payload) {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(payload));
+  return [...new Uint8Array(signature)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function timingSafeEqualHex(left, right) {
+  const normalizedLeft = String(left || "").toLowerCase();
+  const normalizedRight = String(right || "").toLowerCase();
+  if (!/^[0-9a-f]+$/.test(normalizedLeft) || normalizedLeft.length !== normalizedRight.length) return false;
+
+  let diff = 0;
+  for (let index = 0; index < normalizedRight.length; index += 1) {
+    diff |= normalizedLeft.charCodeAt(index) ^ normalizedRight.charCodeAt(index);
+  }
+  return diff === 0;
 }
 
 function isPaidEvent(eventType, data) {
@@ -151,14 +166,14 @@ function isStatusEvent(eventType, data) {
   );
 }
 
-async function provisionPaidLicense(eventType, data) {
+async function provisionPaidLicense(env, eventType, data) {
   const customData = data.custom_data || {};
   const activationRequestId = customData.activation_request_id;
   const plan = String(customData.plan || "").toLowerCase();
 
   validateActivationPayload(activationRequestId, plan, data);
 
-  const existingLicense = await getLicenseByActivationRequestId(activationRequestId);
+  const existingLicense = await getLicenseByActivationRequestId(env, activationRequestId);
   const email = data.customer?.email || data.customer_email || existingLicense?.email || null;
   const licenseKey = existingLicense?.license_key || generateLicenseKey();
   const status = normalizeLicenseStatus(data.status) || "active";
@@ -175,13 +190,13 @@ async function provisionPaidLicense(eventType, data) {
     updated_at: new Date().toISOString()
   };
 
-  await upsertActivationRequest({
+  await upsertActivationRequest(env, {
     activation_request_id: activationRequestId,
     email,
     selected_plan: plan,
     status: "paid"
   });
-  await upsertLicense(license);
+  await upsertLicense(env, license);
 
   console.log("Provisioned RenalFlow license from Paddle webhook", {
     activationRequestId,
@@ -193,7 +208,7 @@ async function provisionPaidLicense(eventType, data) {
   });
 }
 
-async function updateLicenseStatus(eventType, data) {
+async function updateLicenseStatus(env, eventType, data) {
   const customData = data.custom_data || {};
   const activationRequestId = customData.activation_request_id;
   const subscriptionId = data.subscription_id || data.id;
@@ -206,15 +221,15 @@ async function updateLicenseStatus(eventType, data) {
   }
 
   const existingLicense = activationRequestId
-    ? await getLicenseByActivationRequestId(activationRequestId)
-    : await getLicenseBySubscriptionId(subscriptionId);
+    ? await getLicenseByActivationRequestId(env, activationRequestId)
+    : await getLicenseBySubscriptionId(env, subscriptionId);
 
   if (!existingLicense) {
     console.log("No license found for Paddle status update", { eventType, activationRequestId, subscriptionId });
     return;
   }
 
-  await patchLicense(existingLicense.id, {
+  await patchLicense(env, existingLicense.id, {
     status,
     paddle_subscription_id: subscriptionId || existingLicense.paddle_subscription_id,
     paddle_transaction_id: transactionId || existingLicense.paddle_transaction_id,
@@ -222,7 +237,7 @@ async function updateLicenseStatus(eventType, data) {
   });
 
   const activationStatus = status === "cancelled" ? "expired" : status === "past_due" ? "failed" : "paid";
-  await patchActivationRequest(existingLicense.activation_request_id, {
+  await patchActivationRequest(env, existingLicense.activation_request_id, {
     status: activationStatus,
     updated_at: new Date().toISOString()
   });
@@ -271,45 +286,45 @@ function normalizeLicenseStatus(status) {
 }
 
 function generateLicenseKey() {
-  const token = crypto.randomBytes(24).toString("base64url").toUpperCase();
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  const token = [...bytes].map((byte) => byte.toString(36).padStart(2, "0")).join("").toUpperCase();
   return `RF-${token.slice(0, 8)}-${token.slice(8, 16)}-${token.slice(16, 24)}`;
 }
 
-async function getLicenseByActivationRequestId(activationRequestId) {
-  const rows = await supabaseFetch(
-    `/licenses?activation_request_id=eq.${encodeURIComponent(activationRequestId)}&select=*`,
-    { method: "GET" }
-  );
+async function getLicenseByActivationRequestId(env, activationRequestId) {
+  const rows = await supabaseFetch(env, `/licenses?activation_request_id=eq.${encodeURIComponent(activationRequestId)}&select=*`, {
+    method: "GET"
+  });
   return rows[0] || null;
 }
 
-async function getLicenseBySubscriptionId(subscriptionId) {
+async function getLicenseBySubscriptionId(env, subscriptionId) {
   if (!subscriptionId) return null;
-  const rows = await supabaseFetch(
-    `/licenses?paddle_subscription_id=eq.${encodeURIComponent(subscriptionId)}&select=*`,
-    { method: "GET" }
-  );
+  const rows = await supabaseFetch(env, `/licenses?paddle_subscription_id=eq.${encodeURIComponent(subscriptionId)}&select=*`, {
+    method: "GET"
+  });
   return rows[0] || null;
 }
 
-async function upsertLicense(license) {
-  return supabaseFetch("/licenses?on_conflict=activation_request_id", {
+async function upsertLicense(env, license) {
+  return supabaseFetch(env, "/licenses?on_conflict=activation_request_id", {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=representation" },
     body: JSON.stringify([license])
   });
 }
 
-async function patchLicense(id, patch) {
-  return supabaseFetch(`/licenses?id=eq.${encodeURIComponent(id)}`, {
+async function patchLicense(env, id, patch) {
+  return supabaseFetch(env, `/licenses?id=eq.${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { Prefer: "return=minimal" },
     body: JSON.stringify(patch)
   });
 }
 
-async function upsertActivationRequest(record) {
-  return supabaseFetch("/activation_requests?on_conflict=activation_request_id", {
+async function upsertActivationRequest(env, record) {
+  return supabaseFetch(env, "/activation_requests?on_conflict=activation_request_id", {
     method: "POST",
     headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
     body: JSON.stringify([
@@ -321,21 +336,21 @@ async function upsertActivationRequest(record) {
   });
 }
 
-async function patchActivationRequest(activationRequestId, patch) {
-  return supabaseFetch(`/activation_requests?activation_request_id=eq.${encodeURIComponent(activationRequestId)}`, {
+async function patchActivationRequest(env, activationRequestId, patch) {
+  return supabaseFetch(env, `/activation_requests?activation_request_id=eq.${encodeURIComponent(activationRequestId)}`, {
     method: "PATCH",
     headers: { Prefer: "return=minimal" },
     body: JSON.stringify(patch)
   });
 }
 
-async function supabaseFetch(path, options) {
-  const baseUrl = process.env.SUPABASE_URL.replace(/\/$/, "");
+async function supabaseFetch(env, path, options) {
+  const baseUrl = env.SUPABASE_URL.replace(/\/$/, "");
   const response = await fetch(`${baseUrl}/rest/v1${path}`, {
     ...options,
     headers: {
-      apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+      Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
       "Content-Type": "application/json",
       ...(options.headers || {})
     }
