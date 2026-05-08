@@ -80,7 +80,7 @@ function validateQuery() {
 }
 
 async function loadCheckoutConfig() {
-  const response = await fetch(`/api/paddle-config?plan_slug=${encodeURIComponent(checkoutContext.planSlug)}`, {
+  const response = await fetch(`/api/paddle-config?plan=${encodeURIComponent(checkoutContext.planSlug)}`, {
     headers: { Accept: "application/json" }
   });
   const body = await response.json().catch(() => ({}));
