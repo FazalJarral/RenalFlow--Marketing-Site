@@ -28,11 +28,21 @@ export async function onRequestGet({ request, env }) {
     return json({ error: "Checkout is not configured" }, { status: 500 });
   }
 
+  const environment = env.PADDLE_ENVIRONMENT || "sandbox";
+  const expectedTokenPrefix = environment === "sandbox" ? "test_" : "live_";
+  if (!env.PADDLE_CLIENT_TOKEN.startsWith(expectedTokenPrefix)) {
+    console.error("Paddle checkout config has an invalid client-side token prefix", {
+      environment,
+      expectedTokenPrefix
+    });
+    return json({ error: "Checkout is not configured" }, { status: 500 });
+  }
+
   return json({
     plan,
     priceId,
     clientToken: env.PADDLE_CLIENT_TOKEN,
-    environment: env.PADDLE_ENVIRONMENT || "sandbox"
+    environment
   });
 }
 
