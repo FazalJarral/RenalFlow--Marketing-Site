@@ -20,6 +20,7 @@ const params = new URLSearchParams(window.location.search);
 const checkoutContext = {
   transactionId: params.get("_ptxn") || "",
   centerId: params.get("center_id") || "",
+  authUserId: params.get("auth_user_id") || "",
   planSlug: (params.get("plan_slug") || params.get("plan") || "").toLowerCase(),
   billingInterval: (params.get("billing_interval") || "monthly").toLowerCase(),
   activationRequestId: params.get("activation_request_id") || "",
@@ -58,8 +59,12 @@ function renderPlan(plan) {
 }
 
 function validateQuery() {
+  if (!checkoutContext.transactionId) {
+    throw new Error("To upgrade your RenalFlow center, please open the RenalFlow desktop app and upgrade from Billing.");
+  }
+
   if (!checkoutContext.centerId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(checkoutContext.centerId)) {
-    throw new Error("Missing center_id. Open checkout from RenalFlow desktop.");
+    throw new Error("To upgrade your RenalFlow center, please open the RenalFlow desktop app and upgrade from Billing.");
   }
 
   if (!planCopy[checkoutContext.planSlug]) {
@@ -158,6 +163,7 @@ function checkoutPayload() {
       center_id: checkoutContext.centerId,
       plan_slug: checkoutContext.planSlug,
       billing_interval: checkoutContext.billingInterval,
+      auth_user_id: checkoutContext.authUserId,
       device_id: checkoutContext.deviceId,
       email: checkoutContext.email,
       source: checkoutContext.source,
@@ -198,6 +204,7 @@ async function start() {
     selectedName.textContent = "Invalid request";
     selectedDetails.textContent = "RenalFlow could not validate this checkout link.";
     selectedPrice.textContent = "--";
+    checkoutButton.disabled = true;
     showMessage(error.message, true);
   }
 }
